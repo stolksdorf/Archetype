@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<body>
+	<div class='container'>
+
+	</div>
+
+</body>
+
+
+<script type="text/javascript" src="archetype.js"></script>
+
+
+
+
+<script>
+
+
+
+	var mix = {
+		boo  : function()
+		{
+			alert('temp');
+			return this;
+		},
+	}
+
+
+	var test = Archetype.extend({
+		initialize : function()
+		{
+			console.log('supered');
+			return this;
+		},
+	});
+	test.mixin(mix);
+
+	var test2 = test.extend({
+		temp : 13,
+		initialize : function(temp)
+		{
+			var self = this;
+			this.temp = temp || this.temp;
+
+			this.super('initialize');
+
+			console.log('awesome', this.temp);
+
+
+			GLOBAL = this.on('test', function(){
+				console.log('awesome', self.temp);
+			});
+
+
+			return this;
+		},
+	});
+
+	var testInstance = test2.instance(6);
+	var testInstance2 = test2.instance();
+
+
+
+</script>
+
+
+
+</html>
