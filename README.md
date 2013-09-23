@@ -23,6 +23,31 @@ An experimental micro inheritance and events library for javascript.
 `.trigger(eventName), .trigger(eventId)` - Triggers event listeners for all given events.
 
 
+##Examples
 
+	var Ball = Archetype.extend({
+		initialize : function()
+		{
+			this.on('bounce', function(){
 
+			});
+			return this;
+		},
+		bounce : function()
+		{
+			console.log('bounce');
+			return this;
+		}
+	});
 
+	var myBall = Ball.instance();
+
+	var MemoryBall = Ball.extend({
+		bounceCount : 0,
+		getBounceCount  : function()
+		{
+			return this.bounceCount;
+		},
+	};
+
+	myBall.mixin(BounceCountMixin);
