@@ -5,14 +5,13 @@ An experimental micro inheritance and events library for javascript.
 
 ## Inhertiance
 
-`.instance(args)` - Returns a new instance of the Obj, calling it's initialize function passing the args along
+`.create(args)` - Returns a new instance of the Obj, calling it's initialize and each of it's prototype's initialize
 
 `.extend(methods)` - Returns a new instance of Obj, with the given methods mixed in.
 
 `.mixin(methods)` - Mixes in the given methods to the object and returns it.
 
-`.super(methodName, args)` - Calls the given methodName with the args, if it exists somewhere in the prototype chain
-
+`.super()` - Intelligently returns the object's prototype, useful for calling overwritten functions
 
 ## Events
 
