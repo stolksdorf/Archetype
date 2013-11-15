@@ -37,9 +37,6 @@
 			}
 			return this;
 		},
-		/**
-		 * returns a function which will call all 'method's on each ofthe ancestors
-		 */
 		deep : function(method){
 			var self = this;
 			var deep = function(){
@@ -76,7 +73,7 @@
 		trigger : function(eventIdentifier){
 			//if(this.silent()) return this;
 			var evts = this.events();
-			var args = Array.prototype.slice.apply(arguments).slice(1); //try [].slice(...)
+			var args = [].slice.apply(arguments).slice(1);
 			for(var i in evts){
 				var evt = evts[i];
 				if(eventIdentifier == evt.id || eventIdentifier == evt.name || evt.name === '*'){
