@@ -1,0 +1,216 @@
+
+
+
+We'll design a completely barebones inheritance framework as a learning experience in Javascript. We'll call it Archetype for fun.
+
+Let's list what we need for an object oriented framework and why we need it.
+
+### Inheritance
+The crux of an object oriented framework is the ability to create new objects that have behaviours of other objects. Javascript supports this, using **Prototypical Inheritance**, but with a rather ugly and unapporachable syntax. Prototypical Inhertiance works where every object in Javascript has a protoperty that points to another object. Whenever you try to access a property or function that doesn't exist on your current object, it looks to it's prototype for it. This is called the **Prototype Chain**.
+
+(example of prototype chain)
+
+Typical object inherititance in Javascript looks like this.
+
+	function Person(gender) {
+	  this.gender = gender;
+	}
+
+	Person.prototype.sayHello = function(){
+	  alert ('hello');
+	};
+
+	var person1 = new Person('Male');
+	var person2 = new Person('Female');
+
+	person1.sayHello();
+
+It's odd to see functions here when we only wanted to create objects. Functions are the only type in Javascript that allows us to access and modify the prototype property, making it ideal for defining and creating prototypical objects. The `new` keyword does two things; creates a new object and sets that object's prototype to the prototype of the function used with `new`.
+
+Inheriting from our `Person` function/object in our previous example requires a bit more weird syntax.
+
+	Programmer = function () {};
+	Programmer.prototype = new Person();
+
+	Programmer.prototype.occupation = 'programmer';
+	person3 = new Programmer();
+
+http://zeekat.nl/articles/constructors-considered-mildly-confusing.html
+
+This is pretty gross, so our first order with Archetype is to add some sugar to this. As well, we'll try our best to move away from involving functions inhertitance and object creation as it's unintutive.
+
+So we need to
+
+* Create new objects with a specific prototype
+* Extend current objects with new methods and properties
+
+
+### END HERE
+
+
+We are going to use `Object.create` instead of the `new` keyword and functions to create our new objects. `Object.create` takes a single parameter that will become the prototype of the new object it returns. Here's some code that re-creates it functionality
+
+	Object.create = function(proto) {
+		function Obj(){};
+		Obj.prototype = proto;
+		return new Obj();
+	};
+
+Let's create our initial object we'll base every off off
+
+	Archetype = {};
+
+We'll add a function that creates a new object that sets the current object as it's prototype.
+
+	Archetype = {
+		extend : function(){
+			var obj = Object.create(this);
+			return obj;
+		}
+	};
+
+	//example
+	var newObject = Archetype.extend();
+
+Now we'll want to add new functionality to this object.
+
+	Archetype = {
+		extend : function(){
+			var obj = Object.create(this);
+			return obj;
+		},
+		mixin : function(methods){
+			for(var methodName in methods){
+				this[methodName] = methods[methodName];
+			}
+			return this;
+		},
+	};
+
+	var Ball = Archetype.extend();
+	Ball.mixin({
+		color : 'blue',
+		bounce : function(){
+			alert(this.color + " ball is bouncing!");
+		}
+	});
+	Ball.bounce();
+
+The two times we want to create new objects are to extend current object's through inheritance, `extend` and to create new instances of a given object.
+
+	Archetype = {
+		create : function(){
+			var obj = this.extend();
+			return obj;
+		},
+		extend : function(methods){
+			var obj = Object.create(this);
+			return obj.mixin(methods);
+		},
+		mixin : function(methods){
+			for(var methodName in methods){
+				this[methodName] = methods[methodName];
+			}
+			return this;
+		},
+	};
+
+	var Ball = Archetype.extend({
+		color : 'blue',
+		bounce : function(){
+			alert(this.color + " ball is bouncing!");
+		}
+	});
+
+	var myBall   = Ball.create();
+	var yourBall = Ball.create();
+
+We added some sugar to `extend` to automatically mixin in methods, and added a `create` function that simply makes a new instance of Ball.
+
+Often we'd like run a function when we create a new instance of an object, often called a constructor. For Archetype we'll call it `initialize`.
+
+	Archetype = {
+		initialize : function(){
+			return this;
+		},
+		create : function(){
+			var obj = this.extend();
+			obj.initialize.apply(obj, arguments);
+			return obj;
+		},
+		extend : function(methods){
+			var obj = Object.create(this);
+			return obj.mixin(methods);
+		},
+		mixin : function(methods){
+			for(var methodName in methods){
+				this[methodName] = methods[methodName];
+			}
+			return this;
+		},
+	};
+
+Perfect! In 20(ish) lines of code we already have a very powerful and very approachable framework for inheritance. Let's check it out in action.
+
+Astute readers may be found a slight defficiny with our current version. If we extend an object more then once when we create a new instance not all of our initializes will be called.
+
+
+[ Example of multiple inherititance ]
+
+
+**Note: The following is a tad advanced**
+To fix this we'll create a function that will call all versions of that function up the prototype chain.
+
+We'll setup a recursive function with two steps, firstly check if the function name exists at all in the prototype chain, if so, go to the prototype and run this again. Secondly, if the function exists on the current object, call it.
+
+	deep : function(methodName){
+		var self = this;
+		var deep = function(){
+			//still exists a version of the method in the prototype chain
+			if(this[methodName]){
+				deep.apply(Object.getPrototypeOf(this), arguments);
+			}
+			//If the method exists on the current object
+			if(this.hasOwnProperty(methodName)){
+				return this[methodName].apply(self, arguments);
+			}
+		};
+		//Return a copy of this recursive function for the user to call
+		return deep.bind(this);
+	}
+
+Let's add this to our definition
+
+	Archetype = {
+		initialize : function(){
+			return this;
+		},
+		create : function(){
+			var obj = this.extend();
+			obj.deep('initialize').apply(obj, arguments);
+			return obj;
+		},
+		extend : function(methods){
+			var obj = Object.create(this);
+			return obj.mixin(methods);
+		},
+		mixin : function(methods){
+			for(var methodName in methods){
+				this[methodName] = methods[methodName];
+			}
+			return this;
+		},
+		deep : function(method){
+			var self = this;
+			var deep = function(){
+				if(this[method]) deep.apply(Object.getPrototypeOf(this), arguments);
+				if(this.hasOwnProperty(method)) return this[method].apply(self, arguments);
+			};
+			return deep.bind(this);
+		}
+	};
+
+
+Next we'll look at adding events to your framework. How exciting!
+
+
