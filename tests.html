@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<body>
+	<div class='container'>
+	</div>
+</body>
+
+<script type="text/javascript" src="archetype.js"></script>
+<script type="text/javascript" src="archetype.v2.js"></script>
+
+
+<script>
+
+
+	var test = function(f){
+		this.initialize = function(f){
+			console.log('init', f);
+		}
+
+		this.initialize(f)
+
+
+		this.cool = function(){
+			console.log('neat');
+		};
+	}
+
+	test.extend = function(methods){
+		console.log('cool', methods);
+	}
+
+	var t= new test();
+
+
+
+	var base = Archetype.extend({
+		initialize : function(){
+
+			return this;
+		},
+		name : function(){
+			console.log("base");
+			return this;
+		},
+
+	});
+
+
+
+	var b1 = base.extend({
+		initialize : function(){
+
+			return this;
+		},
+		name : function(){
+			console.log("base");
+			return this;
+		},
+	})
+
+
+
+
+</script>
+
+
+
+</html>
