@@ -20,11 +20,7 @@
 		},
 		extend : function(methods){
 			var obj = Object.create(this);
-			obj.events = function(set, add){
-				if(set) this.storedEvents = set;
-				if(add) this.storedEvents.push(add);
-				return this.storedEvents;
-			}.bind({storedEvents : []});
+			makeObservable(obj);
 			return obj.mixin(methods);
 		},
 		mixin : function(methods){
@@ -40,10 +36,17 @@
 				if(this.hasOwnProperty(method)) return this[method].apply(self, arguments);
 			};
 			return deep.bind(this);
-		},
+		}
+	};
 
-		//Events
-		on : function(eventName, event, once){
+	var makeObservable = function(obj){
+		obj.events = function(set, add){
+			if(set) this.storedEvents = set;
+			if(add) this.storedEvents.push(add);
+			return this.storedEvents;
+		}.bind({storedEvents : []});
+
+		obj.on = function(eventName, event, once){
 			this.events(undefined, {
 				id        : ++eventId,
 				name      : eventName,
@@ -51,11 +54,11 @@
 				fireOnce  : once || false
 			});
 			return eventId;
-		},
-		once : function(eventName, event){
+		};
+		obj.once = function(eventName, event){
 			return this.on(eventName, event, true);
-		},
-		trigger : function(eventIdentifier){
+		};
+		obj.trigger = function(eventIdentifier){
 			var args = [].slice.apply(arguments).slice(1);
 			for(var i in this.events()){
 				var evt = evts[i];
@@ -65,10 +68,10 @@
 				}
 			}
 			return this;
-		},
-		off : function(eventIdentifier){
+		};
+		obj.off = function(eventIdentifier){
 			if(!eventIdentifier) this.events([]); //Clear the events if nothing provided
-			var remainingEvents = []
+			var remainingEvents = [];
 			for(var i in this.events()){
 				var evt = this.events()[i];
 				if(eventIdentifier != evt.id && eventIdentifier != evt.name){
@@ -77,6 +80,10 @@
 			}
 			this.events(remainingEvents);
 			return this;
-		}
+		};
+
+		return obj;
 	};
+
+
 })();
