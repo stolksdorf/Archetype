@@ -11,7 +11,7 @@
 		initialize : function(){
 			return this;
 		},
-		create : function(){
+		create : function(args){
 			var obj = this.extend();
 			obj.deep('initialize').apply(obj, arguments);
 			obj.trigger('created', obj);
@@ -44,7 +44,7 @@
 			return this.storedEvents;
 		},
 		on : function(eventName, event, once){
-			this.events(undefined, {
+			this.events(false, {
 				id    : ++archetype_EventCount,
 				name  : eventName,
 				fn    : event,
