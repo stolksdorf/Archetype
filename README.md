@@ -40,7 +40,7 @@ Creates a new object and sets it's prototype to the object you are creating from
 **deep** &nbsp; `object.deep(methodName, arg1, arg2, arg3...)` <br>
 Being able to access functions from object within the prototype chain can be useful, however can be dangerous. Accidentally modifying objects within the prototype chain can have far reaching effects on many objects inheriting from it. Archetype limits this danger by restricting itself to only execute functions (using the current scope) objects inherited from.
 
-`deep()` traverses the prototype chain and executes every function with a given name in order from oldest to newest. It's Archetypes's form of `super`. Used to call each `initialize()` in the prototype chain whenever you use `create()`.
+`deep()` traverses the prototype chain and executes every function with a given name in order from oldest to newest. It's Archetypes's form of `super`. Used in Archetype to call each `initialize()` in the prototype chain whenever you use `create()`.
 
 	Sloth.mixin({
 		classification : function(){
