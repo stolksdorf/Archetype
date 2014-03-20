@@ -53,7 +53,7 @@ Being able to access functions from object within the prototype chain can be use
 			console.log("Family : Bradypodidae");
 		}
 	})
-	mySloth.deep("classification");
+	mySloth.deep("classification"); //both the suborder and family will be printed
 
 
 # Events
