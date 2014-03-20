@@ -14,7 +14,7 @@
 		create : function(){
 			var obj = this.extend();
 			obj.deep('initialize').apply(obj, arguments);
-			obj.trigger('created', obj); //remove? test with presto
+			obj.trigger('created', obj);
 			return obj;
 		},
 		extend : function(methods){
@@ -60,21 +60,16 @@
 			var args = [].slice.apply(arguments).slice(1);
 			for(var i in evts){
 				var evt = evts[i];
-				if(eventIdentifier == evt.id || eventIdentifier == evt.name){
+				if(eventIdentifier == evt.id || eventIdentifier == evt.name || evt.name === '*'){
 					evt.fn.apply(this, args);
 					if(evt.fireOnce) this.off(evt.id);
-				}
-				//Add ability to pass event name in
-				if(evt.name === '*'){
-					//TODO: add the evenbt identifier to the args array and push that through
-					args.unshift(eventIdentifier);
-					evt.fn.apply(this, args);
 				}
 			}
 			return this;
 		},
 		off : function(eventIdentifier){
-			if(!eventIdentifier) this.events([]); //Clear the events if nothing provided
+			//Clear the events if nothing provided
+			if(!eventIdentifier) this.events([]);
 			var remainingEvents = []
 			for(var i in this.events()){
 				var evt = this.events()[i];
